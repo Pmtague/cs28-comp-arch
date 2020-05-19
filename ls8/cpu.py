@@ -10,10 +10,10 @@ class CPU:
         self.ram = [0] * 256
         self.registers = [0] * 8
         self.pc = 0
-        self.ir = 0
-        self.mar = 0
-        self.mdr = 0
         self.fl = 0
+        # self.ir = None
+        # self.mar = None
+        # self.mdr = None
     
     def ram_read(self, address):
         return self.ram[address]
@@ -74,4 +74,8 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        running = True
+
+        while running:
+
+            instruction = program[pc]
