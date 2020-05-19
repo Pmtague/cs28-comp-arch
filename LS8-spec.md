@@ -1,6 +1,6 @@
 # LS-8 Microcomputer Spec v4.0
 
-## Registers
+## Registers (For storing data)
 
 8 general-purpose 8-bit numeric registers R0-R7.
 
@@ -13,7 +13,7 @@
 > register values in that range.
 
 
-## Internal Registers
+## Internal Registers (Cannot be accessed outside the CPU)
 
 * `PC`: Program Counter, address of the currently executing instruction
 * `IR`: Instruction Register, contains a copy of the currently executing instruction
@@ -22,7 +22,7 @@
 * `FL`: Flags, see below
 
 
-## Flags
+## Flags (CMP = compares to operands)
 
 The flags register `FL` holds the current flags status. These flags
 can change based on the operands given to the `CMP` opcode.

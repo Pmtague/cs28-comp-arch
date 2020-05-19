@@ -30,7 +30,7 @@ class CPU:
             self.ram[address] = instruction
             address += 1
 
-
+    # ALU = arithmetic logic unit: performs basic math and logic operations
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
