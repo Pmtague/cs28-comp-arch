@@ -8,16 +8,18 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256
-        self.registers = [0] * 8
+        self.register = [0] * 8
         self.pc = 0
         self.fl = 0
         # self.ir = None
         # self.mar = None
         # self.mdr = None
     
+    # Returns the value at the given memory address
     def ram_read(self, address):
         return self.ram[address]
 
+    # Writes the given value to the given memory address
     def ram_write(self, value, address):
         self.ram[address] = value
 
@@ -27,8 +29,9 @@ class CPU:
         address = 0
 
         # For now, we've just hardcoded a program:
+        # Need to be able to run from any program file eventually
 
-        program = [
+        program = [     # Instructions
             # From print8.ls8
             0b10000010, # LDI R0,8
             0b00000000,
@@ -38,6 +41,7 @@ class CPU:
             0b00000001, # HLT
         ]
 
+        # Loops through the program and adds each instruction to a memory address
         for instruction in program:
             self.ram[address] = instruction
             address += 1
@@ -74,21 +78,32 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+
+        # Boolean to control the running process
         running = True
 
+        # Instructions
         LDI = 0b10000010
         PRN = 0b01000111
         HLT = 0b00000001
 
         while running:
 
+            # Set instruction to a variable
             instruction = self.ram_read(self.pc)
 
+            # Set the value of a register to an integer
             if instruction == LDI:
-                pass
+                reg_num = self.ram[self.pc + 1]
+                value = self.ram[self.pc + 2]
+                self.register[reg_num] = value
+                self.pc += 3
 
             elif instruction == PRN:
-                pass
+                reg_num = self.ram[self.pc + 1]
+                value = self.register[reg_num]
+                print(value)
+                self.pc += 2
 
             elif instruction == HLT:
                 running = False
