@@ -24,38 +24,64 @@ class CPU:
         self.ram[address] = value
 
     # Grabs program from example directory and loads it into memory
-    def load(self):
+    def load(self, file):
         """Load a program into memory."""
 
         # Address counter for looping
         address = 0
 
-        # path_to_file = "examples/file_name"
+        # Open file with auto-close
+        with open(file) as f:
+
+            # Loop through each line in the file
+            for line in f:
+
+                # Get rid of anything in the line that starts with #
+                split_line = line.split("#")
+
+                # Get rid of any leading or trailing spaces
+                formatted_line = split_line[0].strip()
+
+                # If the current line is 8 characters long
+                if len(formatted_line) == 8:
+
+                    # Convert the line to a binary integer
+                    value = int(formatted_line, 2)
+
+                    # Add that value to the current ram address
+                    self.ram[address] = value
+
+                # If the current line is not 8 characters long
+                else:
+                    continue
+
+                # Move to the next memory address
+                address += 1
 
         # For now, we've just hardcoded a program:
-        # Need to be able to run from any program file eventually
 
-        program = [     # Instructions
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
+        # program = [     # Instructions
+        #     # From print8.ls8
+        #     0b10000010,  # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111,  # PRN R0
+        #     0b00000000,
+        #     0b00000001,  # HLT
+        # ]
 
         # Loops through the program and adds each instruction to a memory address
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
 
     # ALU = arithmetic logic unit: performs basic math and logic operations
-    def alu(self, op, reg_a, reg_b):
+
+    def alu(self, op, register_a, register_b):
         """ALU operations."""
 
         if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
+            self.register[register_a] += self.register[register_b]
         # elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
@@ -76,7 +102,7 @@ class CPU:
         ), end='')
 
         for i in range(8):
-            print(" %02X" % self.reg[i], end='')
+            print(" %02X" % self.register[i], end='')
 
         print()
 
@@ -90,6 +116,7 @@ class CPU:
         LDI = 0b10000010
         PRN = 0b01000111
         HLT = 0b00000001
+        MUL = 0b10100010
 
         # Some instructions require up to the next two bytes of data after the PC in memory to perform operations on.
         # Sometimes the byte value is a register number, other times it's a constant value (in the case of LDI).
@@ -116,6 +143,10 @@ class CPU:
 
             elif ir == HLT:
                 running = False
+
+            elif ir == MUL:
+                self.register[operand_a] *= self.register[operand_b]
+                self.pc += 3
 
             else:
                 print("Unknown instruction")
