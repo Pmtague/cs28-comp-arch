@@ -2,6 +2,7 @@
 
 import sys
 
+
 class CPU:
     """Main CPU class."""
 
@@ -11,10 +12,9 @@ class CPU:
         self.register = [0] * 8
         self.pc = 0
         self.fl = 0
-        # self.ir = None
         # self.mar = None
         # self.mdr = None
-    
+
     # Returns the value at the given memory address
     def ram_read(self, address):
         return self.ram[address]
@@ -23,22 +23,26 @@ class CPU:
     def ram_write(self, value, address):
         self.ram[address] = value
 
+    # Grabs program from example directory and loads it into memory
     def load(self):
         """Load a program into memory."""
 
+        # Address counter for looping
         address = 0
+
+        # path_to_file = "examples/file_name"
 
         # For now, we've just hardcoded a program:
         # Need to be able to run from any program file eventually
 
         program = [     # Instructions
             # From print8.ls8
-            0b10000010, # LDI R0,8
+            0b10000010,  # LDI R0,8
             0b00000000,
             0b00001000,
-            0b01000111, # PRN R0
+            0b01000111,  # PRN R0
             0b00000000,
-            0b00000001, # HLT
+            0b00000001,  # HLT
         ]
 
         # Loops through the program and adds each instruction to a memory address
@@ -52,7 +56,7 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        # elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -64,8 +68,8 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
-            #self.ie,
+            # self.fl,
+            # self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
             self.ram_read(self.pc + 2)
@@ -87,28 +91,32 @@ class CPU:
         PRN = 0b01000111
         HLT = 0b00000001
 
+        # Some instructions require up to the next two bytes of data after the PC in memory to perform operations on.
+        # Sometimes the byte value is a register number, other times it's a constant value (in the case of LDI).
+
         while running:
 
             # Set instruction to a variable
-            instruction = self.ram_read(self.pc)
+            ir = self.ram_read(self.pc)
+
+            # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b in case
+            # the instruction needs them.
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
 
             # Set the value of a register to an integer
-            if instruction == LDI:
-                reg_num = self.ram[self.pc + 1]
-                value = self.ram[self.pc + 2]
-                self.register[reg_num] = value
+            if ir == LDI:
+                self.register[operand_a] = operand_b
                 self.pc += 3
 
-            elif instruction == PRN:
-                reg_num = self.ram[self.pc + 1]
-                value = self.register[reg_num]
+            elif ir == PRN:
+                value = self.register[operand_a]
                 print(value)
                 self.pc += 2
 
-            elif instruction == HLT:
+            elif ir == HLT:
                 running = False
 
             else:
                 print("Unknown instruction")
                 running = False
-
