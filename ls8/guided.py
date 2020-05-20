@@ -28,6 +28,8 @@ while running:
 
     inst = memory[pc]
 
+	# inst_len = '????'
+
     if inst == PRINT_BEEJ:
         print("Beej!")
         pc += 1
@@ -51,6 +53,4 @@ while running:
         print("Unknown instruction")
         running = False
 
-print("This is the name of the script: ", sys.argv[0])
-print("Number of arguments: ", len(sys.argv))
-print("The arguments are: ", str(sys.argv))
+	# pc += inst_len

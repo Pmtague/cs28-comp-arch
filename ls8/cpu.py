@@ -10,6 +10,9 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.register = [0] * 8
+        self.sp = self.register[7]
+        # self.int_status = self.register[6]
+        # self.int_mask = self.register[5]
         self.pc = 0
         self.fl = 0
         # self.mar = None
@@ -22,6 +25,12 @@ class CPU:
     # Writes the given value to the given memory address
     def ram_write(self, value, address):
         self.ram[address] = value
+
+    def push(self, register):
+        pass
+
+    def pop(self, register):
+        pass
 
     # Grabs program from example directory and loads it into memory
     def load(self, file):
@@ -96,6 +105,9 @@ class CPU:
         elif op == "MUL":
             self.register[register_a] *= self.register[register_b]
 
+        elif op == "AND":
+            self.register[register_a] = self.register[register_a] and self.register[register_b]
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -133,6 +145,8 @@ class CPU:
         ADD = 0b10100000
         SUB = 0b10100001
         AND = 0b10101000
+        PUSH = 0b01000101
+        POP = 0b01000110
 
         # Some instructions require up to the next two bytes of data after the PC in memory to perform operations on.
         # Sometimes the byte value is a register number, other times it's a constant value (in the case of LDI).
@@ -164,6 +178,16 @@ class CPU:
                 value = self.register[operand_a]
                 print(value)
                 self.pc += 2
+            
+            elif ir == AND:
+                self.alu("AND", operand_a, operand_b)
+                self.pc += 3
+            
+            elif ir == PUSH:
+                continue
+
+            elif ir == POP:
+                continue
 
             elif ir == HLT:
                 running = False
