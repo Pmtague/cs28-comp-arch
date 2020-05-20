@@ -89,7 +89,13 @@ class CPU:
 
         if op == "ADD":
             self.register[register_a] += self.register[register_b]
-        # elif op == "SUB": etc
+
+        elif op == "SUB":
+            self.register[register_a] -= self.register[b]
+
+        elif op == "MUL":
+            self.register[register_a] *= self.register[b]
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -124,6 +130,9 @@ class CPU:
         PRN = 0b01000111
         HLT = 0b00000001
         MUL = 0b10100010
+        ADD = 0b10100000
+        SUB = 0b10100001
+        AND = 0b10101000
 
         # Some instructions require up to the next two bytes of data after the PC in memory to perform operations on.
         # Sometimes the byte value is a register number, other times it's a constant value (in the case of LDI).
@@ -144,7 +153,7 @@ class CPU:
                 self.pc += 3
 
             elif ir == MUL:
-                self.register[operand_a] *= self.register[operand_b]
+                self.alu(MUL, operand_a, operand_b)
                 self.pc += 3
 
             elif ir == PRN:
