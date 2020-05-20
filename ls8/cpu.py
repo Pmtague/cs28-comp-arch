@@ -27,36 +27,43 @@ class CPU:
     def load(self, file):
         """Load a program into memory."""
 
-        # Address counter for looping
-        address = 0
+        try:
 
-        # Open file with auto-close
-        with open(file) as f:
+            # Address counter for looping
+            address = 0
 
-            # Loop through each line in the file
-            for line in f:
+            # Open file with auto-close
+            with open(file) as f:
 
-                # Get rid of anything in the line that starts with #
-                split_line = line.split("#")
+                # Loop through each line in the file
+                for line in f:
 
-                # Get rid of any leading or trailing spaces
-                formatted_line = split_line[0].strip()
+                    # Get rid of anything in the line that starts with #
+                    split_line = line.split("#")
 
-                # If the current line is 8 characters long
-                if len(formatted_line) == 8:
+                    # Get rid of any leading or trailing spaces
+                    formatted_line = split_line[0].strip()
 
-                    # Convert the line to a binary integer
-                    value = int(formatted_line, 2)
+                    # If the current line is 8 characters long
+                    if len(formatted_line) == 8:
 
-                    # Add that value to the current ram address
-                    self.ram[address] = value
+                        # Convert the line to a binary integer
+                        value = int(formatted_line, 2)
 
-                # If the current line is not 8 characters long
-                else:
-                    continue
+                        # Add that value to the current ram address
+                        self.ram[address] = value
 
-                # Move to the next memory address
-                address += 1
+                    # If the current line is not 8 characters long
+                    else:
+                        continue
+
+                    # Move to the next memory address
+                    address += 1
+
+        except FileNotFoundError:
+
+            print(f"{file} not found")
+            sys.exit(2)
 
         # For now, we've just hardcoded a program:
 
@@ -136,6 +143,10 @@ class CPU:
                 self.register[operand_a] = operand_b
                 self.pc += 3
 
+            elif ir == MUL:
+                self.register[operand_a] *= self.register[operand_b]
+                self.pc += 3
+
             elif ir == PRN:
                 value = self.register[operand_a]
                 print(value)
@@ -143,10 +154,6 @@ class CPU:
 
             elif ir == HLT:
                 running = False
-
-            elif ir == MUL:
-                self.register[operand_a] *= self.register[operand_b]
-                self.pc += 3
 
             else:
                 print("Unknown instruction")
