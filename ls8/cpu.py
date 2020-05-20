@@ -156,6 +156,10 @@ class CPU:
                 self.alu("MUL", operand_a, operand_b)
                 self.pc += 3
 
+            elif ir = SUB:
+                self.alu("SUB", operand_a, operand_b)
+                self.pc += 3
+
             elif ir == PRN:
                 value = self.register[operand_a]
                 print(value)
