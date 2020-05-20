@@ -91,10 +91,10 @@ class CPU:
             self.register[register_a] += self.register[register_b]
 
         elif op == "SUB":
-            self.register[register_a] -= self.register[b]
+            self.register[register_a] -= self.register[register_b]
 
         elif op == "MUL":
-            self.register[register_a] *= self.register[b]
+            self.register[register_a] *= self.register[register_b]
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -153,7 +153,7 @@ class CPU:
                 self.pc += 3
 
             elif ir == MUL:
-                self.alu(MUL, operand_a, operand_b)
+                self.alu("MUL", operand_a, operand_b)
                 self.pc += 3
 
             elif ir == PRN:
