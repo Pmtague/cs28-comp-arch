@@ -76,6 +76,24 @@ class CPU:
         """Run the CPU."""
         running = True
 
+        LDI = 0b10000010
+        PRN = 0b01000111
+        HLT = 0b00000001
+
         while running:
 
-            instruction = program[pc]
+            instruction = self.ram_read(self.pc)
+
+            if instruction == LDI:
+                pass
+
+            elif instruction == PRN:
+                pass
+
+            elif instruction == HLT:
+                running = False
+
+            else:
+                print("Unknown instruction")
+                running = False
+
