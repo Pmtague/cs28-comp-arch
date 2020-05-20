@@ -10,7 +10,7 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.register = [0] * 8
-        self.sp = self.register[7]
+        self.sp = 7
         # self.int_status = self.register[6]
         # self.int_mask = self.register[5]
         self.pc = 0
@@ -26,11 +26,23 @@ class CPU:
     def ram_write(self, value, address):
         self.ram[address] = value
 
+    # Push value from register address into ram address of stack pointer
     def push(self, register):
-        pass
 
+        # Decrement Stack Pointer (SP)
+        self.sp -= 1
+
+        # Store current value of SP
+        ram_address = self.register[self.sp]
+
+        # Add stored SP value in RAM (Add to stack at designated area of RAM?)
+        self.ram[ram_address] = self.register[register]
+
+    # Retreive value from RAM address pointed to by the SP
     def pop(self, register):
         pass
+        # 
+
 
     # Grabs program from example directory and loads it into memory
     def load(self, file):
@@ -74,25 +86,7 @@ class CPU:
             print(f"{file} not found")
             sys.exit(2)
 
-        # For now, we've just hardcoded a program:
-
-        # program = [     # Instructions
-        #     # From print8.ls8
-        #     0b10000010,  # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111,  # PRN R0
-        #     0b00000000,
-        #     0b00000001,  # HLT
-        # ]
-
-        # Loops through the program and adds each instruction to a memory address
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
-
     # ALU = arithmetic logic unit: performs basic math and logic operations
-
     def alu(self, op, register_a, register_b):
         """ALU operations."""
 
@@ -184,10 +178,12 @@ class CPU:
                 self.pc += 3
             
             elif ir == PUSH:
-                continue
+                self.push()
+                self.pc += 2
 
             elif ir == POP:
-                continue
+                self.pop()
+                self.pc += 2
 
             elif ir == HLT:
                 running = False
