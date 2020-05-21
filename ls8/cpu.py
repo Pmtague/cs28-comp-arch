@@ -11,6 +11,7 @@ class CPU:
         self.ram = [0] * 256
         self.register = [0] * 8
         self.sp = 7
+        self.register[self.sp] = 0xF4
         # self.int_status = self.register[6]
         # self.int_mask = self.register[5]
         self.pc = 0
@@ -30,37 +31,29 @@ class CPU:
     def push(self, register):
 
         # Decrement Stack Pointer (SP)
-        self.register[self.sp] -= 1
+        self.register[self.sp] -= 1 # 0xF2
 
-        # Get the value out of the register
-        value = self.register[register]
+        # Get the value from the given register
+        value = self.register[register] # 2
 
-        # Store current value of SP
-        top_of_stack_addr = self.register[self.sp]
+        # Add stored register value to RAM (Add to stack at designated area of RAM?)
+        self.ram[self.register[self.sp]] = value
 
-        # Add stored SP value to RAM (Add to stack at designated area of RAM?)
-        self.ram[top_of_stack_addr] = value
-
-    # Retreive value from RAM address pointed to by the SP
+    # Retreive value from RAM address pointed to by the SP and input into given register
     def pop(self, register):
 
-        # Get the register number from the SP
-        top_of_stack_addr = self.register[self.sp]
+        # Get the value from the stack pointer
+        value = self.ram[self.register[self.sp]]
+
+        # Add the value to the register
+        self.register[register] = value
+
+        # Increment SP
+        self.register[self.sp] += 1
         
-        if self.ram[top_of_stack_addr] == self.register[register]:
-
-            # Get the value
-            value = self.ram[top_of_stack_addr]
-
-            # Add the value to the register
-            self.register[register] = value
-
-            # Increment SP
-            self.register[self.sp] += 1
-        
-        else:
-            # print(f'')
-            exit(1)
+        # else:
+        #     # print(f'')
+        #     exit(1)
 
     # Grabs program from example directory and loads it into memory
     def load(self, file):
@@ -116,8 +109,8 @@ class CPU:
         elif op == "MUL":
             self.register[register_a] *= self.register[register_b]
 
-        elif op == "AND":
-            self.register[register_a] = self.register[register_a] and self.register[register_b]
+        # elif op == "AND":
+        #     self.register[register_a] = self.register[register_a] and self.register[register_b]
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -167,8 +160,7 @@ class CPU:
             # Set instruction to a variable
             ir = self.ram_read(self.pc)
 
-            # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b in case
-            # the instruction needs them.
+            # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b for use in instructions
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
@@ -177,29 +169,33 @@ class CPU:
                 self.register[operand_a] = operand_b
                 self.pc += 3
 
+            # Multiply two given values
             elif ir == MUL:
                 self.alu("MUL", operand_a, operand_b)
                 self.pc += 3
 
+            # Subtract two given values
             elif ir == SUB:
                 self.alu("SUB", operand_a, operand_b)
                 self.pc += 3
 
+            # Print the value at the given location
             elif ir == PRN:
                 value = self.register[operand_a]
                 print(value)
                 self.pc += 2
             
-            elif ir == AND:
-                self.alu("AND", operand_a, operand_b)
-                self.pc += 3
+            # Compare the two operands
+            # elif ir == AND:
+            #     self.alu("AND", operand_a, operand_b)
+            #     self.pc += 3
             
             elif ir == PUSH:
-                self.push(self.register[operand_a])
+                self.push(operand_a)
                 self.pc += 2
 
             elif ir == POP:
-                self.pop(self.register[operand_a])
+                self.pop(operand_a)
                 self.pc += 2
 
             elif ir == HLT:
