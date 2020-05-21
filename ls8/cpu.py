@@ -31,10 +31,10 @@ class CPU:
     def push(self, register):
 
         # Decrement Stack Pointer (SP)
-        self.register[self.sp] -= 1 # 0xF2
+        self.register[self.sp] -= 1
 
         # Get the value from the given register
-        value = self.register[register] # 2
+        value = self.register[register]
 
         # Store the top of stack address which is always in the SP slot of the registry
         top_of_stack_addr = self.register[self.sp]
@@ -46,10 +46,10 @@ class CPU:
     def pop(self, register):
 
         # Get the value from the stack pointer
-        value = self.ram[self.register[self.sp]]
+        top_of_stack_addr = self.ram[self.register[self.sp]]
 
         # Add the value to the register
-        self.register[register] = value
+        self.register[register] = top_of_stack_addr
 
         # Increment SP
         self.register[self.sp] += 1
@@ -82,6 +82,7 @@ class CPU:
 
                         # Add that value to the current ram address
                         self.ram[address] = value
+                        print("RAM Instructions from Program Load", self.ram[address])
 
                     # If the current line is not 8 characters long
                     else:
@@ -160,6 +161,7 @@ class CPU:
 
             # Set instruction to a variable
             ir = self.ram_read(self.pc)
+            print("PC", self.ram_read(self.pc))
 
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b for use in instructions
             operand_a = self.ram_read(self.pc + 1)
@@ -173,6 +175,11 @@ class CPU:
             # Multiply two given values
             elif ir == MUL:
                 self.alu("MUL", operand_a, operand_b)
+                self.pc += 3
+
+            # Add two given values
+            elif ir == ADD:
+                self.alu("ADD", operand_a, operand_b)
                 self.pc += 3
 
             # Subtract two given values
@@ -201,12 +208,12 @@ class CPU:
 
             elif ir == CALL:
                 return_addr = operand_b
+                print("Call Return Address", return_addr)
 
-                # self.register[self.sp] -= 1
-                # top_of_stack_addr = self.register[self.sp]
-                # self.ram[top_of_stack_addr] = return_addr
-
-                self.push(self.ram[return_addr])
+                self.register[self.sp] -= 1
+                top_of_stack_addr = self.register[self.sp]
+                self.ram[top_of_stack_addr] = return_addr
+                print("Push Return Address", self.ram[top_of_stack_addr])
 
                 reg_num = self.ram[operand_a]
                 subroutine_addr = self.register[reg_num]
@@ -214,15 +221,20 @@ class CPU:
                 self.pc = subroutine_addr
 
             elif ir == RET:
-                top_of_stack_addr = self.register[self.sp]
-                return_addr = self.ram[top_of_stack_addr]
+                return_addr = self.ram[self.register[self.sp]]
+                print("Return Address", return_addr)
+                print("Expecting", self.ram[self.register[self.sp]])
                 self.register[self.sp] += 1
-
                 self.pc = return_addr
+                print("PC at end of RET", self.pc)
+
 
             elif ir == HLT:
                 running = False
 
             else:
-                print("Unknown instruction")
-                running = False
+                print(f'Unknown instruction {ir} at address {self.pc}')
+                exit(1)
+
+# cpu = CPU()
+# cpu.run()
