@@ -36,8 +36,11 @@ class CPU:
         # Get the value from the given register
         value = self.register[register] # 2
 
+        # Store the top of stack address which is always in the SP slot of the registry
+        top_of_stack_addr = self.register[self.sp]
+
         # Add stored register value to RAM (Add to stack at designated area of RAM?)
-        self.ram[self.register[self.sp]] = value
+        self.ram[top_of_stack_addr] = value
 
     # Retreive value from RAM address pointed to by the SP and input into given register
     def pop(self, register):
@@ -50,10 +53,6 @@ class CPU:
 
         # Increment SP
         self.register[self.sp] += 1
-        
-        # else:
-        #     # print(f'')
-        #     exit(1)
 
     # Grabs program from example directory and loads it into memory
     def load(self, file):
@@ -151,6 +150,8 @@ class CPU:
         AND = 0b10101000
         PUSH = 0b01000101
         POP = 0b01000110
+        CALL = 0b01010000
+        RET = 0b00010001
 
         # Some instructions require up to the next two bytes of data after the PC in memory to perform operations on.
         # Sometimes the byte value is a register number, other times it's a constant value (in the case of LDI).
@@ -197,6 +198,27 @@ class CPU:
             elif ir == POP:
                 self.pop(operand_a)
                 self.pc += 2
+
+            elif ir == CALL:
+                return_addr = operand_b
+
+                # self.register[self.sp] -= 1
+                # top_of_stack_addr = self.register[self.sp]
+                # self.ram[top_of_stack_addr] = return_addr
+
+                self.push(self.ram[return_addr])
+
+                reg_num = self.ram[operand_a]
+                subroutine_addr = self.register[reg_num]
+
+                self.pc = subroutine_addr
+
+            elif ir == RET:
+                top_of_stack_addr = self.register[self.sp]
+                return_addr = self.ram[top_of_stack_addr]
+                self.register[self.sp] += 1
+
+                self.pc = return_addr
 
             elif ir == HLT:
                 running = False
