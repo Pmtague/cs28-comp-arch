@@ -30,23 +30,40 @@ class CPU:
     def push(self, register):
 
         # Decrement Stack Pointer (SP)
-        self.sp -= 1
+        self.register[self.sp] -= 1
+
+        # Get the value out of the register
+        value = self.register[register]
 
         # Store current value of SP
-        ram_address = self.register[self.sp]
+        top_of_stack_addr = self.register[self.sp]
 
-        # Add stored SP value in RAM (Add to stack at designated area of RAM?)
-        self.ram[ram_address] = self.register[register]
+        # Add stored SP value to RAM (Add to stack at designated area of RAM?)
+        self.ram[top_of_stack_addr] = value
 
     # Retreive value from RAM address pointed to by the SP
     def pop(self, register):
-        pass
-        # 
 
+        # Get the register number from the SP
+        top_of_stack_addr = self.register[self.sp]
+        
+        if self.ram[top_of_stack_addr] == self.register[register]:
+
+            # Get the value
+            value = self.ram[top_of_stack_addr]
+
+            # Add the value to the register
+            self.register[register] = value
+
+            # Increment SP
+            self.register[self.sp] += 1
+        
+        else:
+            # print(f'')
+            exit(1)
 
     # Grabs program from example directory and loads it into memory
     def load(self, file):
-        """Load a program into memory."""
 
         try:
 
@@ -178,11 +195,11 @@ class CPU:
                 self.pc += 3
             
             elif ir == PUSH:
-                self.push()
+                self.push(self.register[operand_a])
                 self.pc += 2
 
             elif ir == POP:
-                self.pop()
+                self.pop(self.register[operand_a])
                 self.pc += 2
 
             elif ir == HLT:
