@@ -15,7 +15,7 @@ class CPU:
         # self.int_status = self.register[6]
         # self.int_mask = self.register[5]
         self.pc = 0
-        self.fl = 0
+        self.fl = 0b00000111
         # self.mar = None
         # self.mdr = None
 
@@ -110,8 +110,59 @@ class CPU:
         elif op == "MUL":
             self.register[register_a] *= self.register[register_b]
 
-        # elif op == "AND":
-        #     self.register[register_a] = self.register[register_a] and self.register[register_b]
+        elif op == "DIV":
+            if self.register[register_b] == 0:
+                print(f'Dividing by 0 is not allowed')
+                exit(1)
+            else:
+                self.register[register_a] /= self.register[register_b]
+
+        elif op == "MOD":
+            if self.register[register_b] == 0:
+                print(f'Dividing by 0 is not allowed')
+                exit(1)
+            else:
+                self. register[register_a] = self.register[register_a] % self.register[register_b]
+
+        elif op == "AND":
+            self.register[register_a] = self.register[register_a] & self.register[register_b]
+
+        elif op == "OR":
+            self.register[register_a] = self.register[register_a] | self.register[register_b]
+
+        elif op == "NOT":
+            self.register[register_a] = self.register[register_a] ~ self.register[register_b]
+
+        elif op == "XOR":
+            self.register[register_a] = self.register[register_a] ^ self.register[register_b]
+
+        elif op == "CMP":
+            if self.register[register_a] == self.register[register_b]:
+                # set the Equal E flag to 1
+            else:
+                # otherwise set it to 0
+
+            if self.register[register_a] < self.register[register_b]:
+                # set the Less-than L flag to 1
+            else:
+                # otherwise set it to 0
+
+            if self.register[register_a] > self.register[register_b]:
+                # set the Greater-than G flag to 1
+            else:
+                # otherwise set it to 0
+
+        elif op == "DEC":
+            self.register[register_a] -= 1
+
+        elif op == "INC":
+            self.register[register_a] += 1
+
+        elif op == "SHL":
+            self.register[register_a] << self.register[register_b]
+
+        elif op == "SHR":
+            self.register[register_a] >> self.register[register_b]
 
         else:
             raise Exception("Unsupported ALU operation")
