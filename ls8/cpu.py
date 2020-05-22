@@ -12,12 +12,45 @@ class CPU:
         self.register = [0] * 8
         self.sp = 7
         self.register[self.sp] = 0xF4
-        # self.int_status = self.register[6]
-        # self.int_mask = self.register[5]
-        self.pc = 0
-        self.fl = 0b00000111
-        # self.mar = None
-        # self.mdr = None
+        self.pc = 0 # Index of current instruction
+        # self.fl = 0b00000000
+
+        # self.instructions = {
+        #     ADD : 0b10100000,
+        #     AND : 0b10101000,
+        #     CALL : 0b01010000,
+        #     CMP : 0b10100111,
+        #     DEC : 0b01100110,
+        #     DIV : 0b10100011,
+        #     HLT : 0b00000001,
+        #     INC : 0b01100101,
+        #     INT : 0b01010010,
+        #     IRET : 0b00010011,
+        #     JEQ : 0b01010101,
+        #     JGE : 0b01011010,
+        #     JGT : 0b01010111,
+        #     JLE : 0b01011001,
+        #     JLT : 0b01011000,
+        #     JMP : 0b01010100,
+        #     JNE : 0b01010110,
+        #     LD : 0b10000011,
+        #     LDI : 0b10000010,
+        #     MOD : 0b10100100,
+        #     MUL : 0b10100010,
+        #     NOP : 0b00000000,
+        #     NOT : 0b01101001,
+        #     OR : 0b10101010,
+        #     POP : 0b01000110,
+        #     PRA : 0b01001000,
+        #     PRN : 0b01000111,
+        #     PUSH : 0b01000101,
+        #     RET : 0b00010001,
+        #     SHL : 0b10101100,
+        #     SHR : 0b10101101,
+        #     ST : 0b10000100,
+        #     SUB : 0b10100001,
+        #     XOR : 0b10101011
+        # }
 
     # Returns the value at the given memory address
     def ram_read(self, address):
@@ -82,8 +115,8 @@ class CPU:
 
                         # Add that value to the current ram address
                         self.ram[address] = value
-                        # print("RAM Instructions from Program Load",
-                        #   self.ram[address])
+                        print("RAM Instructions from Program Load",
+                        self.ram[address])
 
                     # If the current line is not 8 characters long
                     else:
@@ -110,59 +143,55 @@ class CPU:
         elif op == "MUL":
             self.register[register_a] *= self.register[register_b]
 
-        elif op == "DIV":
-            if self.register[register_b] == 0:
-                print(f'Dividing by 0 is not allowed')
-                exit(1)
-            else:
-                self.register[register_a] /= self.register[register_b]
+        # elif op == "DIV":
+        #     if self.register[register_b] == 0:
+        #         print(f'Dividing by 0 is not allowed')
+        #         exit(1)
+            # else:
+            #     self.register[register_a] /= self.register[register_b]
 
-        elif op == "MOD":
-            if self.register[register_b] == 0:
-                print(f'Dividing by 0 is not allowed')
-                exit(1)
-            else:
-                self. register[register_a] = self.register[register_a] % self.register[register_b]
+        # elif op == "MOD":
+        #     if self.register[register_b] == 0:
+        #         print(f'Dividing by 0 is not allowed')
+        #         exit(1)
+        #     else:
+        #         self. register[register_a] = self.register[register_a] % self.register[register_b]
 
-        elif op == "AND":
-            self.register[register_a] = self.register[register_a] & self.register[register_b]
+        # elif op == "AND":
+        #     self.register[register_a] = self.register[register_a] & self.register[register_b]
 
-        elif op == "OR":
-            self.register[register_a] = self.register[register_a] | self.register[register_b]
+        # elif op == "OR":
+        #     self.register[register_a] = self.register[register_a] | self.register[register_b]
 
-        elif op == "NOT":
-            self.register[register_a] = self.register[register_a] ~ self.register[register_b]
+        # elif op == "NOT":
+        #     self.register[register_a] = self.register[register_a] ~ self.register[register_b]
 
-        elif op == "XOR":
-            self.register[register_a] = self.register[register_a] ^ self.register[register_b]
+        # elif op == "XOR":
+        #     self.register[register_a] = self.register[register_a] ^ self.register[register_b]
 
-        elif op == "CMP":
-            if self.register[register_a] == self.register[register_b]:
-                # set the Equal E flag to 1
-            else:
-                # otherwise set it to 0
+        # elif op == "CMP":
+        #     if self.register[register_a] == self.register[register_b]:
+        #             self.fl = self.fl | 0b00000001
+                
+        #     elif self.register[register_a] < self.register[register_b]:
+        #         self.fl = self.fl | 0b00000100
 
-            if self.register[register_a] < self.register[register_b]:
-                # set the Less-than L flag to 1
-            else:
-                # otherwise set it to 0
+        #     elif self.register[register_a] > self.register[register_b]:
+        #         self.fl = self.fl | 0b00000010
+        #     else:
+        #         self.fl = 0b00000000
 
-            if self.register[register_a] > self.register[register_b]:
-                # set the Greater-than G flag to 1
-            else:
-                # otherwise set it to 0
+        # elif op == "DEC":
+        #     self.register[register_a] -= 1
 
-        elif op == "DEC":
-            self.register[register_a] -= 1
+        # elif op == "INC":
+        #     self.register[register_a] += 1
 
-        elif op == "INC":
-            self.register[register_a] += 1
+        # elif op == "SHL":
+        #     self.register[register_a] << self.register[register_b]
 
-        elif op == "SHL":
-            self.register[register_a] << self.register[register_b]
-
-        elif op == "SHR":
-            self.register[register_a] >> self.register[register_b]
+        # elif op == "SHR":
+        #     self.register[register_a] >> self.register[register_b]
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -236,7 +265,7 @@ class CPU:
 
             # Set instruction to a variable
             ir = self.ram_read(self.pc)
-            # print("PC", self.ram_read(self.pc))
+            print("PC", self.ram_read(self.pc))
 
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b for use in instructions
             operand_a = self.ram_read(self.pc + 1)
@@ -258,20 +287,15 @@ class CPU:
                 self.pc += 3
 
             # Subtract two given values
-            elif ir == SUB:
-                self.alu("SUB", operand_a, operand_b)
-                self.pc += 3
+            # elif ir == SUB:
+            #     self.alu("SUB", operand_a, operand_b)
+            #     self.pc += 3
 
             # Print the value at the given location
             elif ir == PRN:
                 value = self.register[operand_a]
                 print(value)
                 self.pc += 2
-
-            # Compare the two operands
-            # elif ir == AND:
-            #     self.alu("AND", operand_a, operand_b)
-            #     self.pc += 3
 
             elif ir == PUSH:
                 self.push(operand_a)
@@ -283,12 +307,10 @@ class CPU:
 
             elif ir == CALL:
                 return_addr = self.pc + 2
-                # print("Call Return Address", return_addr)
 
                 self.register[self.sp] -= 1
                 top_of_stack_addr = self.register[self.sp]
                 self.ram[top_of_stack_addr] = return_addr
-                # print("Push Return Address", self.ram[top_of_stack_addr])
 
                 reg_num = self.ram[operand_a]
                 subroutine_addr = self.register[reg_num]
@@ -297,11 +319,30 @@ class CPU:
 
             elif ir == RET:
                 return_addr = self.ram[self.register[self.sp]]
-                # print("Return Address", return_addr)
-                # print("Expecting", self.ram[self.register[self.sp]])
+                print("Return Address", return_addr)
+                print("Expecting", self.ram[self.register[self.sp]])
                 self.register[self.sp] += 1
                 self.pc = return_addr
-                # print("PC at end of RET", self.pc)
+                print("PC at end of RET", self.pc)
+
+            # elif ir == CMP:
+            #     self.alu("CMP", operand_a, operand_b)
+            #     print("CMP", operand_a)
+            #     self.pc += 3
+
+            # elif ir == JMP:
+            #     self.pc = self.register[operand_a]
+            #     print("PC in JMP", self.pc)
+
+            # elif ir == JEQ:
+            #     if self.fl == 0b00000001:
+            #         self.pc = self.register[operand_a]
+            #         print("PC in JEQ", self.pc)
+            
+            # elif ir == JNE:
+            #     if self.fl == 0b00000000:
+            #         self.pc = self.register[operand_a]
+            #         print("PC in JNE", self.pc)
 
             elif ir == HLT:
                 running = False
