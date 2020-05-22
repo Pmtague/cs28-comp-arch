@@ -13,7 +13,7 @@ class CPU:
         self.sp = 7
         self.register[self.sp] = 0xF4
         self.pc = 0 # Index of current instruction
-        # self.fl = 0b00000000
+        self.fl = 0
 
         # self.instructions = {
         #     ADD : 0b10100000,
@@ -115,8 +115,8 @@ class CPU:
 
                         # Add that value to the current ram address
                         self.ram[address] = value
-                        print("RAM Instructions from Program Load",
-                        self.ram[address])
+                        # print("RAM Instructions from Program Load",
+                        # self.ram[address])
 
                     # If the current line is not 8 characters long
                     else:
@@ -150,36 +150,36 @@ class CPU:
             # else:
             #     self.register[register_a] /= self.register[register_b]
 
-        # elif op == "MOD":
-        #     if self.register[register_b] == 0:
-        #         print(f'Dividing by 0 is not allowed')
-        #         exit(1)
-        #     else:
-        #         self. register[register_a] = self.register[register_a] % self.register[register_b]
+        elif op == "MOD":
+            if self.register[register_b] == 0:
+                print(f'Dividing by 0 is not allowed')
+                exit(1)
+            else:
+                self. register[register_a] = self.register[register_a] % self.register[register_b]
 
-        # elif op == "AND":
-        #     self.register[register_a] = self.register[register_a] & self.register[register_b]
+        elif op == "AND":
+            self.register[register_a] = self.register[register_a] & self.register[register_b]
 
-        # elif op == "OR":
-        #     self.register[register_a] = self.register[register_a] | self.register[register_b]
+        elif op == "OR":
+            self.register[register_a] = self.register[register_a] | self.register[register_b]
 
         # elif op == "NOT":
         #     self.register[register_a] = self.register[register_a] ~ self.register[register_b]
 
-        # elif op == "XOR":
-        #     self.register[register_a] = self.register[register_a] ^ self.register[register_b]
+        elif op == "XOR":
+            self.register[register_a] = self.register[register_a] ^ self.register[register_b]
 
-        # elif op == "CMP":
-        #     if self.register[register_a] == self.register[register_b]:
-        #             self.fl = self.fl | 0b00000001
+        elif op == "CMP":
+            if self.register[register_a] == self.register[register_b]:
+                    self.fl = 0b00000001
                 
-        #     elif self.register[register_a] < self.register[register_b]:
-        #         self.fl = self.fl | 0b00000100
+            elif self.register[register_a] < self.register[register_b]:
+                self.fl = 0b00000100
 
-        #     elif self.register[register_a] > self.register[register_b]:
-        #         self.fl = self.fl | 0b00000010
-        #     else:
-        #         self.fl = 0b00000000
+            elif self.register[register_a] > self.register[register_b]:
+                self.fl = 0b00000010
+            else:
+                self.fl = 0b00000000
 
         # elif op == "DEC":
         #     self.register[register_a] -= 1
@@ -265,7 +265,7 @@ class CPU:
 
             # Set instruction to a variable
             ir = self.ram_read(self.pc)
-            print("PC", self.ram_read(self.pc))
+            # print("PC", self.ram_read(self.pc))
 
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b for use in instructions
             operand_a = self.ram_read(self.pc + 1)
@@ -287,9 +287,9 @@ class CPU:
                 self.pc += 3
 
             # Subtract two given values
-            # elif ir == SUB:
-            #     self.alu("SUB", operand_a, operand_b)
-            #     self.pc += 3
+            elif ir == SUB:
+                self.alu("SUB", operand_a, operand_b)
+                self.pc += 3
 
             # Print the value at the given location
             elif ir == PRN:
@@ -319,30 +319,34 @@ class CPU:
 
             elif ir == RET:
                 return_addr = self.ram[self.register[self.sp]]
-                print("Return Address", return_addr)
-                print("Expecting", self.ram[self.register[self.sp]])
+                # print("Return Address", return_addr)
+                # print("Expecting", self.ram[self.register[self.sp]])
                 self.register[self.sp] += 1
                 self.pc = return_addr
-                print("PC at end of RET", self.pc)
+                # print("PC at end of RET", self.pc)
 
-            # elif ir == CMP:
-            #     self.alu("CMP", operand_a, operand_b)
-            #     print("CMP", operand_a)
-            #     self.pc += 3
+            elif ir == CMP:
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += 3
+                # print("CMP", self.fl)
 
-            # elif ir == JMP:
-            #     self.pc = self.register[operand_a]
-            #     print("PC in JMP", self.pc)
+            elif ir == JMP:
+                self.pc = self.register[operand_a]
+                # print("PC in JMP", self.pc)
 
-            # elif ir == JEQ:
-            #     if self.fl == 0b00000001:
-            #         self.pc = self.register[operand_a]
-            #         print("PC in JEQ", self.pc)
+            elif ir == JEQ:
+                if self.fl & 0b00000001:
+                    self.pc = self.register[operand_a]
+                    # print("PC in JEQ", self.pc)
+                else:
+                    self.pc += 2
             
-            # elif ir == JNE:
-            #     if self.fl == 0b00000000:
-            #         self.pc = self.register[operand_a]
-            #         print("PC in JNE", self.pc)
+            elif ir == JNE:
+                if self.fl != 0b00000001:
+                    self.pc = self.register[operand_a]
+                    # print("PC in JNE", self.pc)
+                else:
+                    self.pc += 2
 
             elif ir == HLT:
                 running = False
