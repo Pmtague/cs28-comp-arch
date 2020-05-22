@@ -82,7 +82,8 @@ class CPU:
 
                         # Add that value to the current ram address
                         self.ram[address] = value
-                        print("RAM Instructions from Program Load", self.ram[address])
+                        # print("RAM Instructions from Program Load",
+                        #   self.ram[address])
 
                     # If the current line is not 8 characters long
                     else:
@@ -142,17 +143,40 @@ class CPU:
         running = True
 
         # Instructions
-        LDI = 0b10000010
-        PRN = 0b01000111
-        HLT = 0b00000001
-        MUL = 0b10100010
         ADD = 0b10100000
-        SUB = 0b10100001
         AND = 0b10101000
-        PUSH = 0b01000101
-        POP = 0b01000110
         CALL = 0b01010000
+        CMP = 0b10100111
+        DEC = 0b01100110
+        DIV = 0b10100011
+        HLT = 0b00000001
+        INC = 0b01100101
+        INT = 0b01010010
+        IRET = 0b00010011
+        JEQ = 0b01010101
+        JGE = 0b01011010
+        JGT = 0b01010111
+        JLE = 0b01011001
+        JLT = 0b01011000
+        JMP = 0b01010100
+        JNE = 0b01010110
+        LD = 0b10000011
+        LDI = 0b10000010
+        MOD = 0b10100100
+        MUL = 0b10100010
+        NOP = 0b00000000
+        NOT = 0b01101001
+        OR = 0b10101010
+        POP = 0b01000110
+        PRA = 0b01001000
+        PRN = 0b01000111
+        PUSH = 0b01000101
         RET = 0b00010001
+        SHL = 0b10101100
+        SHR = 0b10101101
+        ST = 0b10000100
+        SUB = 0b10100001
+        XOR = 0b10101011
 
         # Some instructions require up to the next two bytes of data after the PC in memory to perform operations on.
         # Sometimes the byte value is a register number, other times it's a constant value (in the case of LDI).
@@ -161,7 +185,7 @@ class CPU:
 
             # Set instruction to a variable
             ir = self.ram_read(self.pc)
-            print("PC", self.ram_read(self.pc))
+            # print("PC", self.ram_read(self.pc))
 
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b for use in instructions
             operand_a = self.ram_read(self.pc + 1)
@@ -192,12 +216,12 @@ class CPU:
                 value = self.register[operand_a]
                 print(value)
                 self.pc += 2
-            
+
             # Compare the two operands
             # elif ir == AND:
             #     self.alu("AND", operand_a, operand_b)
             #     self.pc += 3
-            
+
             elif ir == PUSH:
                 self.push(operand_a)
                 self.pc += 2
@@ -207,13 +231,13 @@ class CPU:
                 self.pc += 2
 
             elif ir == CALL:
-                return_addr = operand_b
-                print("Call Return Address", return_addr)
+                return_addr = self.pc + 2
+                # print("Call Return Address", return_addr)
 
                 self.register[self.sp] -= 1
                 top_of_stack_addr = self.register[self.sp]
                 self.ram[top_of_stack_addr] = return_addr
-                print("Push Return Address", self.ram[top_of_stack_addr])
+                # print("Push Return Address", self.ram[top_of_stack_addr])
 
                 reg_num = self.ram[operand_a]
                 subroutine_addr = self.register[reg_num]
@@ -222,12 +246,11 @@ class CPU:
 
             elif ir == RET:
                 return_addr = self.ram[self.register[self.sp]]
-                print("Return Address", return_addr)
-                print("Expecting", self.ram[self.register[self.sp]])
+                # print("Return Address", return_addr)
+                # print("Expecting", self.ram[self.register[self.sp]])
                 self.register[self.sp] += 1
                 self.pc = return_addr
-                print("PC at end of RET", self.pc)
-
+                # print("PC at end of RET", self.pc)
 
             elif ir == HLT:
                 running = False
